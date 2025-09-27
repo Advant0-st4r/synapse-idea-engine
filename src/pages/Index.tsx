@@ -1,30 +1,77 @@
 import { useState } from "react";
+import { ApiKeyProvider } from "@/contexts/ApiKeyContext";
 import Header from "@/components/layout/Header";
 import WelcomeSection from "@/components/onboarding/WelcomeSection";
 import InsightInput from "@/components/insights/InsightInput";
 import IdeaPortfolio from "@/components/ideas/IdeaPortfolio";
+import ReportDetail from "@/components/reports/ReportDetail";
+import Settings from "@/components/settings/Settings";
+import Profile from "@/components/profile/Profile";
+import { generateIdeas, type GeneratedIdea } from "@/services/ideaGeneration";
+import { useApiKeys } from "@/contexts/ApiKeyContext";
+import { useToast } from "@/hooks/use-toast";
 
-type AppState = "welcome" | "input" | "portfolio" | "report";
+type AppState = "welcome" | "input" | "portfolio" | "report" | "settings" | "profile";
 
-const Index = () => {
+const IndexContent = () => {
   const [currentState, setCurrentState] = useState<AppState>("welcome");
   const [currentInsight, setCurrentInsight] = useState<string>("");
   const [currentConstraints, setCurrentConstraints] = useState<any>(null);
+  const [generatedIdeas, setGeneratedIdeas] = useState<GeneratedIdea[]>([]);
+  const [selectedIdeaId, setSelectedIdeaId] = useState<string>("");
+  const [isGenerating, setIsGenerating] = useState(false);
+  
+  const { openaiApiKey, anthropicApiKey, preferredModel, hasValidApiKey } = useApiKeys();
+  const { toast } = useToast();
 
   const handleGetStarted = () => {
     setCurrentState("input");
   };
 
-  const handleGenerateIdeas = (insight: string, constraints: any) => {
+  const handleGenerateIdeas = async (insight: string, constraints: any) => {
+    if (!hasValidApiKey()) {
+      toast({
+        title: "API Key Required",
+        description: "Please configure your API keys in Settings before generating ideas.",
+        variant: "destructive",
+      });
+      setCurrentState("settings");
+      return;
+    }
+
+    setIsGenerating(true);
     setCurrentInsight(insight);
     setCurrentConstraints(constraints);
-    setCurrentState("portfolio");
+    
+    try {
+      const apiKey = preferredModel.startsWith('claude-') ? anthropicApiKey : openaiApiKey;
+      const ideas = await generateIdeas({ insight, constraints }, apiKey, preferredModel);
+      setGeneratedIdeas(ideas);
+      setCurrentState("portfolio");
+      
+      toast({
+        title: "Ideas Generated!",
+        description: `Generated ${ideas.length} business ideas based on your insight.`,
+      });
+    } catch (error) {
+      console.error('Error generating ideas:', error);
+      toast({
+        title: "Generation Failed",
+        description: error instanceof Error ? error.message : "Failed to generate ideas. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   const handleViewDetails = (ideaId: string) => {
-    console.log("View details for idea:", ideaId);
-    // This would navigate to the detailed report view
+    setSelectedIdeaId(ideaId);
     setCurrentState("report");
+  };
+
+  const handleNavigate = (state: AppState) => {
+    setCurrentState(state);
   };
 
   const renderCurrentView = () => {
@@ -36,25 +83,15 @@ const Index = () => {
           </div>
         );
       case "input":
-        return <InsightInput onGenerate={handleGenerateIdeas} />;
+        return <InsightInput onGenerate={handleGenerateIdeas} isGenerating={isGenerating} />;
       case "portfolio":
-        return <IdeaPortfolio onViewDetails={handleViewDetails} insight={currentInsight} />;
+        return <IdeaPortfolio onViewDetails={handleViewDetails} insight={currentInsight} ideas={generatedIdeas} />;
       case "report":
-        return (
-          <div className="max-w-4xl mx-auto p-6 text-center">
-            <h1 className="text-3xl font-bold mb-4">Industry Report</h1>
-            <p className="text-muted-foreground mb-8">
-              Detailed report view coming soon! This would show comprehensive market analysis, 
-              competitive landscape, and actionable next steps.
-            </p>
-            <button 
-              onClick={() => setCurrentState("portfolio")}
-              className="text-primary hover:underline"
-            >
-              ← Back to Portfolio
-            </button>
-          </div>
-        );
+        return <ReportDetail ideaId={selectedIdeaId} onBack={() => setCurrentState("portfolio")} />;
+      case "settings":
+        return <Settings />;
+      case "profile":
+        return <Profile />;
       default:
         return <WelcomeSection />;
     }
@@ -62,11 +99,19 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gradient-surface">
-      {currentState !== "welcome" && <Header />}
+      {currentState !== "welcome" && <Header onNavigate={handleNavigate} />}
       <main className={currentState === "welcome" ? "" : "pt-8"}>
         {renderCurrentView()}
       </main>
     </div>
+  );
+};
+
+const Index = () => {
+  return (
+    <ApiKeyProvider>
+      <IndexContent />
+    </ApiKeyProvider>
   );
 };
 

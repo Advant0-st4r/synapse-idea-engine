@@ -16,13 +16,16 @@ interface Constraint {
   max: string;
 }
 
-const InsightInput = ({ onGenerate }: { onGenerate: (insight: string, constraints: any) => void }) => {
+const InsightInput = ({ onGenerate, isGenerating = false }: { 
+  onGenerate: (insight: string, constraints: any) => void;
+  isGenerating?: boolean;
+}) => {
   const [insight, setInsight] = useState("");
   const [constraints, setConstraints] = useState<Constraint[]>([
     {
       id: "innovativeness",
       label: "Innovativeness",
-      description: "How cutting-edge and novel should the ideas be?",
+      description: "How cutting-edge and novel should the ideas be? Higher values favor breakthrough technologies and disruptive approaches, while lower values focus on proven, incremental improvements to existing solutions.",
       value: [5],
       min: "Traditional",
       max: "Breakthrough"
@@ -30,7 +33,7 @@ const InsightInput = ({ onGenerate }: { onGenerate: (insight: string, constraint
     {
       id: "practicality",
       label: "Practicality",
-      description: "How feasible and realistic should the implementation be?",
+      description: "How feasible and realistic should the implementation be? Higher values prioritize ideas with clear execution paths, established markets, and lower risk, while lower values allow for more experimental and unproven approaches.",
       value: [7],
       min: "Experimental",
       max: "Proven"
@@ -38,15 +41,15 @@ const InsightInput = ({ onGenerate }: { onGenerate: (insight: string, constraint
     {
       id: "budget",
       label: "Budget",
-      description: "What's your investment capacity for this venture?",
+      description: "What's your investment capacity for this venture? Higher values generate ideas requiring significant capital (hiring teams, extensive R&D, market expansion), while lower values focus on lean, bootstrapped approaches with minimal upfront costs.",
       value: [5],
-      min: "Bootstrap",
-      max: "Well-funded"
+      min: "Bootstrap ($0-10K)",
+      max: "Well-funded ($500K+)"
     },
     {
       id: "complexity",
       label: "Complexity",
-      description: "How sophisticated should the business model be?",
+      description: "How sophisticated should the business model be? Higher values suggest multi-sided platforms, enterprise solutions, or complex value chains, while lower values focus on straightforward, single-product business models.",
       value: [4],
       min: "Simple",
       max: "Enterprise"
@@ -54,10 +57,10 @@ const InsightInput = ({ onGenerate }: { onGenerate: (insight: string, constraint
     {
       id: "timeToMarket",
       label: "Time to Market",
-      description: "How quickly do you want to launch?",
+      description: "How quickly do you want to launch? Higher values prioritize rapid deployment and MVP approaches, while lower values allow for extensive research, development, and testing phases before market entry.",
       value: [6],
-      min: "Long-term",
-      max: "Immediate"
+      min: "Long-term (12+ months)",
+      max: "Immediate (1-3 months)"
     }
   ]);
 
@@ -187,11 +190,11 @@ const InsightInput = ({ onGenerate }: { onGenerate: (insight: string, constraint
           variant="hero"
           size="xl"
           onClick={handleGenerate}
-          disabled={!insight.trim()}
+          disabled={!insight.trim() || isGenerating}
           className="animate-scale-in"
         >
           <Sparkles className="h-5 w-5" />
-          Generate Business Ideas
+          {isGenerating ? "Generating Ideas..." : "Generate Business Ideas"}
         </Button>
       </div>
     </div>

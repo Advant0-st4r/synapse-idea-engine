@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import IdeaCard from "./IdeaCard";
 import { Search, Filter, Download, Share, TrendingUp } from "lucide-react";
+import type { GeneratedIdea } from "@/services/ideaGeneration";
 
 // Mock data - in real app this would come from props or API
 const mockIdeas = [
@@ -58,16 +59,19 @@ const mockIdeas = [
 interface IdeaPortfolioProps {
   onViewDetails: (id: string) => void;
   insight?: string;
+  ideas?: GeneratedIdea[];
 }
 
-const IdeaPortfolio = ({ onViewDetails, insight }: IdeaPortfolioProps) => {
+const IdeaPortfolio = ({ onViewDetails, insight, ideas }: IdeaPortfolioProps) => {
   const [sortBy, setSortBy] = useState<string>("overall");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
 
-  const categories = Array.from(new Set(mockIdeas.map(idea => idea.category)));
+  const currentIdeas = ideas && ideas.length > 0 ? ideas : mockIdeas;
 
-  const filteredAndSortedIdeas = mockIdeas
+  const categories = Array.from(new Set(currentIdeas.map(idea => idea.category)));
+
+  const filteredAndSortedIdeas = currentIdeas
     .filter(idea => {
       const matchesSearch = idea.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                            idea.summary.toLowerCase().includes(searchTerm.toLowerCase());
@@ -88,9 +92,9 @@ const IdeaPortfolio = ({ onViewDetails, insight }: IdeaPortfolioProps) => {
       }
     });
 
-  const avgDemand = Math.round(mockIdeas.reduce((sum, idea) => sum + idea.demand, 0) / mockIdeas.length);
-  const avgFeasibility = Math.round(mockIdeas.reduce((sum, idea) => sum + idea.feasibility, 0) / mockIdeas.length);
-  const avgROI = Math.round(mockIdeas.reduce((sum, idea) => sum + idea.roi, 0) / mockIdeas.length);
+  const avgDemand = Math.round(currentIdeas.reduce((sum, idea) => sum + idea.demand, 0) / currentIdeas.length);
+  const avgFeasibility = Math.round(currentIdeas.reduce((sum, idea) => sum + idea.feasibility, 0) / currentIdeas.length);
+  const avgROI = Math.round(currentIdeas.reduce((sum, idea) => sum + idea.roi, 0) / currentIdeas.length);
 
   return (
     <div className="max-w-7xl mx-auto p-6 space-y-6">
@@ -129,7 +133,7 @@ const IdeaPortfolio = ({ onViewDetails, insight }: IdeaPortfolioProps) => {
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div className="text-center">
-                <div className="text-2xl font-bold text-primary">{mockIdeas.length}</div>
+                <div className="text-2xl font-bold text-primary">{currentIdeas.length}</div>
                 <div className="text-sm text-muted-foreground">Total Ideas</div>
               </div>
               <div className="text-center">

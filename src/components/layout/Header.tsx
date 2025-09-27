@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Lightbulb, User, Settings } from "lucide-react";
 
-const Header = () => {
+const Header = ({ onNavigate }: { onNavigate?: (state: string) => void }) => {
   return (
     <header className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-50">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -23,27 +23,50 @@ const Header = () => {
 
           {/* Navigation */}
           <nav className="hidden md:flex items-center gap-6">
-            <a href="#" className="text-sm font-medium text-foreground hover:text-primary transition-colors">
+            <button 
+              onClick={() => onNavigate?.("input")}
+              className="text-sm font-medium text-foreground hover:text-primary transition-colors"
+            >
               Dashboard
-            </a>
-            <a href="#" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">
+            </button>
+            <button 
+              onClick={() => onNavigate?.("portfolio")}
+              className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
+            >
               Portfolio
-            </a>
-            <a href="#" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">
+            </button>
+            <button 
+              onClick={() => onNavigate?.("profile")}
+              className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
+            >
               Reports
-            </a>
+            </button>
           </nav>
 
           {/* Actions */}
           <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon" className="hidden sm:flex">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="hidden sm:flex"
+              onClick={() => onNavigate?.("settings")}
+            >
               <Settings className="h-4 w-4" />
             </Button>
-            <Button variant="outline" size="sm" className="hidden sm:flex">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="hidden sm:flex"
+              onClick={() => onNavigate?.("profile")}
+            >
               <User className="h-4 w-4" />
               Profile
             </Button>
-            <Button variant="hero" size="sm">
+            <Button 
+              variant="hero" 
+              size="sm"
+              onClick={() => onNavigate?.("input")}
+            >
               Generate Ideas
             </Button>
           </div>
