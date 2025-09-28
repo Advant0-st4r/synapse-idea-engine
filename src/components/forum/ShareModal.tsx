@@ -1,3 +1,4 @@
+// src/components/forum/ShareModal.tsx
 import React, { useEffect, useState } from "react";
 import Modal from "../ui/modal";
 import { Input } from "../ui/input";
@@ -49,14 +50,11 @@ export default function ShareModal({ open, onOpenChange, idea }: any) {
           <Input value={twitter} onChange={(e) => setTwitter(e.target.value)} placeholder="Twitter URL (optional)" />
         </div>
         <div className="mt-4 flex justify-end gap-2">
-          <Button variant="ghost" onClick={() => onOpenChange(false)}>
-            Cancel
-          </Button>
-          <Button onClick={onShare} disabled={loading}>
-            {loading ? "Sharing..." : "Share"}
-          </Button>
+          <Button variant="ghost" onClick={() => onOpenChange(false)}>Cancel</Button>
+          <Button onClick={onShare} disabled={loading}>{loading ? "Sharing..." : "Share"}</Button>
         </div>
       </div>
     </Modal>
   );
 }
+
