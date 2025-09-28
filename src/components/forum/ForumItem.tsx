@@ -1,3 +1,4 @@
+// src/components/forum/ForumItem.tsx
 import React, { useState } from "react";
 import VoteButton from "./VoteButton";
 import { Button } from "../ui/button";
@@ -13,18 +14,10 @@ export default function ForumItem({ item }: { item: any }) {
     setBusy(true);
     const prev = { ...counts, userVote };
     if (v === 1) {
-      setCounts((c) => ({
-        ...c,
-        up: userVote === 1 ? c.up - 1 : c.up + 1,
-        down: userVote === -1 ? Math.max(c.down - 1, 0) : c.down,
-      }));
+      setCounts((c) => ({ ...c, up: userVote === 1 ? c.up - 1 : c.up + 1, down: userVote === -1 ? Math.max(c.down - 1, 0) : c.down }));
       setUserVote(userVote === 1 ? null : 1);
     } else {
-      setCounts((c) => ({
-        ...c,
-        down: userVote === -1 ? c.down - 1 : c.down + 1,
-        up: userVote === 1 ? Math.max(c.up - 1, 0) : c.up,
-      }));
+      setCounts((c) => ({ ...c, down: userVote === -1 ? c.down - 1 : c.down + 1, up: userVote === 1 ? Math.max(c.up - 1, 0) : c.up }));
       setUserVote(userVote === -1 ? null : -1);
     }
 
@@ -80,10 +73,7 @@ export default function ForumItem({ item }: { item: any }) {
           </div>
         </div>
 
-        <p
-          className="mt-2 text-sm text-muted-foreground overflow-hidden"
-          style={{ WebkitLineClamp: 3, display: "-webkit-box", WebkitBoxOrient: "vertical" }}
-        >
+        <p className="mt-2 text-sm text-muted-foreground overflow-hidden" style={{ WebkitLineClamp: 3, display: "-webkit-box", WebkitBoxOrient: "vertical" }}>
           {item.body}
         </p>
         <div className="mt-3 text-xs text-muted-foreground">Shared {new Date(item.created_at).toLocaleString()}</div>
