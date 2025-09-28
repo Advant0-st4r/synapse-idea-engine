@@ -1,3 +1,4 @@
+// src/pages/Forum.tsx
 import React, { useEffect, useState } from "react";
 import ForumList from "../components/forum/ForumList";
 import { Button } from "../components/ui/button";
@@ -36,4 +37,3 @@ export default function Forum() {
     </div>
   );
 }
-
