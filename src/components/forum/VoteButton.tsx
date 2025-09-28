@@ -1,3 +1,4 @@
+// src/components/forum/VoteButton.tsx
 import React from "react";
 import { Button } from "../ui/button";
 import { ArrowBigUp, ArrowBigDown } from "lucide-react";
@@ -13,3 +14,4 @@ export default function VoteButton({ active, down, onClick, count, ariaLabel }:
     </div>
   );
 }
+
