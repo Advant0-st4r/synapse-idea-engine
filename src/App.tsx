@@ -5,7 +5,7 @@ import NotFound from './pages/NotFound.tsx';
 import SignInPage from './components/auth/SignIn.tsx';
 import SignUpPage from './components/auth/SignUp.tsx';
 // Import other feature components (e.g., Ideas, Insights) assuming they exist
-import Ideas from './components/ideas/Ideas.tsx'; // Adjust paths as needed
+import Ideas from './components/ideas/IdeaCard.tsx'; // Adjust paths as needed
 // ... other imports for protected pages
 
 const ProtectedRoute = ({ children }: { children: JSX.Element }) => (
