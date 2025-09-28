@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-// Use relative imports so Vite won't fail resolving aliases
 import Modal from "../ui/modal";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
@@ -22,12 +21,17 @@ export default function ShareModal({ open, onOpenChange, idea }: any) {
   const onShare = async () => {
     setLoading(true);
     try {
-      await shareIdea({ ideaId: idea?.id, title, body, contactEmail: email, linkedin, twitter });
-      // TODO: show toast success (use your toast)
+      await shareIdea({
+        ideaId: idea?.id,
+        title,
+        body,
+        contactEmail: email,
+        linkedin,
+        twitter,
+      });
       onOpenChange(false);
     } catch (e) {
       console.error(e);
-      // TODO: show toast error
     } finally {
       setLoading(false);
     }
@@ -44,10 +48,13 @@ export default function ShareModal({ open, onOpenChange, idea }: any) {
           <Input value={linkedin} onChange={(e) => setLinkedin(e.target.value)} placeholder="LinkedIn URL (optional)" />
           <Input value={twitter} onChange={(e) => setTwitter(e.target.value)} placeholder="Twitter URL (optional)" />
         </div>
-
         <div className="mt-4 flex justify-end gap-2">
-          <Button variant="ghost" onClick={() => onOpenChange(false)}>Cancel</Button>
-          <Button onClick={onShare} disabled={loading}>{loading ? "Sharing..." : "Share"}</Button>
+          <Button variant="ghost" onClick={() => onOpenChange(false)}>
+            Cancel
+          </Button>
+          <Button onClick={onShare} disabled={loading}>
+            {loading ? "Sharing..." : "Share"}
+          </Button>
         </div>
       </div>
     </Modal>
