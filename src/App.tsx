@@ -1,41 +1,35 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { SignedIn, SignedOut, RedirectToSignIn } from '@clerk/clerk-react';
-import Index from './pages/Index.tsx';
-import NotFound from './pages/NotFound.tsx';
-import SignInPage from './components/auth/SignIn.tsx';
-import SignUpPage from './components/auth/SignUp.tsx';
-// Import other feature components (e.g., Ideas, Insights) assuming they exist
-import Ideas from './components/ideas/IdeaCard.tsx'; // Adjust paths as needed
-// ... other imports for protected pages
-
-const ProtectedRoute = ({ children }: { children: JSX.Element }) => (
-  <>
-    <SignedIn>{children}</SignedIn>
-    <SignedOut>
-      <RedirectToSignIn />
-    </SignedOut>
-  </>
-);
+import LandingPage from './pages/LandingPage.tsx'; // Assuming this exists
+import NotFound from './pages/NotFound.tsx'; // Assuming this exists
+import Ideas from './pages/Ideas.tsx'; // We'll create this
+import SignInPage from './pages/SignIn.tsx'; // We'll create this
+import SignUpPage from './pages/SignUp.tsx'; // We'll create this
 
 function App() {
   return (
-    <Routes>
-      <Route path="/" element={<Index />} />
-      <Route path="/sign-in" element={<SignInPage />} />
-      <Route path="/sign-up" element={<SignUpPage />} />
-      <Route
-        path="/dashboard"
-        element={
-          <ProtectedRoute>
-            <div>{/* Dashboard layout with Header and features */}</div>
-          </ProtectedRoute>
-        }
-      />
-      {/* Add protected routes for features */}
-      <Route path="/ideas" element={<ProtectedRoute><Ideas /></ProtectedRoute>} />
-      {/* ... other protected routes */}
-      <Route path="*" element={<NotFound />} />
-    </Routes>
+    <Router>
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/sign-in" element={<SignInPage />} />
+        <Route path="/sign-up" element={<SignUpPage />} />
+        {/* Protected Route */}
+        <Route
+          path="/ideas"
+          element={
+            <>
+              <SignedIn>
+                <Ideas />
+              </SignedIn>
+              <SignedOut>
+                <RedirectToSignIn />
+              </SignedOut>
+            </>
+          }
+        />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </Router>
   );
 }
 
