@@ -1,25 +1,62 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+// src/contexts/ApiKeyContext.tsx
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { useSyncUser } from '../integrations/supabase/auth';
 import { useUser } from '@clerk/clerk-react';
-import { supabase } from '../integrations/supabase/auth.ts'; // Adjust path
 
-const ApiKeyContext = createContext<{ apiKey: string | null; setApiKey: (key: string) => void }>({
+interface ApiKeyContextValue {
+  apiKey: string | null;
+  loading: boolean;
+  error: Error | null;
+}
+
+const ApiKeyContext = createContext<ApiKeyContextValue>({
   apiKey: null,
-  setApiKey: () => {},
+  loading: true,
+  error: null,
 });
 
-export const ApiKeyProvider = ({ children }: { children: React.ReactNode }) => {
+export const ApiKeyProvider = ({ children }: { children: ReactNode }) => {
+  const { isSignedIn } = useUser();
+  const { getOrCreateApiKey } = useSyncUser();
   const [apiKey, setApiKey] = useState<string | null>(null);
-  const { user } = useUser();
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
-    if (user) {
-      // Fetch user-scoped API key from Supabase
-      const fetchKey = async () => {
-        const { data } = await supabase.from('api_keys').select('key').eq('user_id', user.id).single();
-        setApiKey(data?.key || null);
-      };
-      fetchKey();
+    if (!isSignedIn) {
+      setApiKey(null);
+      setLoading(false);
+      return;
     }
+
+    let cancelled = false;
+    getOrCreateApiKey()
+      .then((key) => {
+        if (!cancelled) {
+          setApiKey(key);
+          setLoading(false);
+        }
+      })
+      .catch((err) => {
+        if (!cancelled) {
+          setError(err);
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isSignedIn, getOrCreateApiKey]);
+
+  return (
+    <ApiKeyContext.Provider value={{ apiKey, loading, error }}>
+      {children}
+    </ApiKeyContext.Provider>
+  );
+};
+
+export const useApiKey = () => useContext(ApiKeyContext);
   }, [user]);
 
   return <ApiKeyContext.Provider value={{ apiKey, setApiKey }}>{children}</ApiKeyContext.Provider>;
