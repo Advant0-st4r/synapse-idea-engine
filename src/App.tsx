@@ -1,19 +1,27 @@
+// src/App.tsx
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { SignedIn, SignedOut, RedirectToSignIn } from '@clerk/clerk-react';
-import LandingPage from './pages/LandingPage.tsx'; // Assuming this exists
-import NotFound from './pages/NotFound.tsx'; // Assuming this exists
-import Ideas from './pages/Ideas.tsx'; // We'll create this
-import SignInPage from './pages/SignIn.tsx'; // We'll create this
-import SignUpPage from './pages/SignUp.tsx'; // We'll create this
+import {
+  SignedIn,
+  SignedOut,
+  RedirectToSignIn,
+} from '@clerk/clerk-react';
+
+import LandingPage from './pages/landing/LandingPage';
+import NotFound from './pages/NotFound';
+import SignInPage from './pages/auth/SignIn';
+import SignUpPage from './pages/auth/SignUp';
+import Ideas from './pages/Ideas';
 
 function App() {
   return (
     <Router>
       <Routes>
+        {/* Public */}
         <Route path="/" element={<LandingPage />} />
-        <Route path="/sign-in" element={<SignInPage />} />
-        <Route path="/sign-up" element={<SignUpPage />} />
-        {/* Protected Route */}
+        <Route path="/sign-in/*" element={<SignInPage />} />
+        <Route path="/sign-up/*" element={<SignUpPage />} />
+
+        {/* Protected */}
         <Route
           path="/ideas"
           element={
@@ -27,6 +35,8 @@ function App() {
             </>
           }
         />
+
+        {/* Catch-all */}
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>
